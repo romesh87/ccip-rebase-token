@@ -83,13 +83,13 @@ cast send ${VAULT_ADDRESS} --value ${AMOUNT} --rpc-url ${ETH_SEPOLIA_RPC_URL} --
 
 # Configure the pool on ZKsync
 echo "Configuring the pool on ZKsync..."
-cast send ${ZKSYNC_POOL_ADDRESS}  --rpc-url ${ZKSYNC_SEPOLIA_RPC_URL} --account ${DEFAULT_ACCOUNT} "applyChainUpdates(uint64[],(uint64,bytes[],bytes,(bool,uint128,uint128),(bool,uint128,uint128))[])" "[${SEPOLIA_CHAIN_SELECTOR}]" "[(${SEPOLIA_CHAIN_SELECTOR},[$(cast abi-encode "f(address)" ${SEPOLIA_POOL_ADDRESS})],$(cast abi-encode "f(address)" ${SEPOLIA_REBASE_TOKEN_ADDRESS}),(false,0,0),(false,0,0))]"
+cast send ${ZKSYNC_POOL_ADDRESS}  --rpc-url ${ZKSYNC_SEPOLIA_RPC_URL} --account ${DEFAULT_ACCOUNT} "applyChainUpdates((uint64,bool,bytes,bytes,(bool,uint128,uint128),(bool,uint128,uint128))[])" "[(${SEPOLIA_CHAIN_SELECTOR},true,$(cast abi-encode "f(address)" ${SEPOLIA_POOL_ADDRESS}),$(cast abi-encode "f(address)" ${SEPOLIA_REBASE_TOKEN_ADDRESS}),(false,0,0),(false,0,0))]"
 
 # Bridge the funds using the script to zksync 
 echo "Bridging the funds using the script to ZKsync..."
 SEPOLIA_BALANCE_BEFORE=$(cast balance $(cast wallet address --account ${DEFAULT_ACCOUNT}) --erc20 ${SEPOLIA_REBASE_TOKEN_ADDRESS} --rpc-url ${ETH_SEPOLIA_RPC_URL})
 echo "Sepolia balance before bridging: $SEPOLIA_BALANCE_BEFORE"
-forge script ./script/BridgeTokens.s.sol:BridgeTokens --rpc-url ${ETH_SEPOLIA_RPC_URL} --account ${DEFAULT_ACCOUNT} --broadcast --sig "run(address,uint64,address,uint256,address,address)" $(cast wallet address --account ${DEFAULT_ACCOUNT}) ${ZKSYNC_SEPOLIA_CHAIN_SELECTOR} ${SEPOLIA_REBASE_TOKEN_ADDRESS} ${AMOUNT} ${SEPOLIA_LINK_ADDRESS} ${SEPOLIA_ROUTER}
+forge script ./script/BridgeTokens.s.sol:BridgeTokens --rpc-url ${ETH_SEPOLIA_RPC_URL} --account ${DEFAULT_ACCOUNT} --broadcast --sig "run(address,uint64,address,uint256,address,address)" ${SEPOLIA_ROUTER} ${ZKSYNC_SEPOLIA_CHAIN_SELECTOR} $(cast wallet address --account ${DEFAULT_ACCOUNT}) ${AMOUNT} ${SEPOLIA_REBASE_TOKEN_ADDRESS} ${SEPOLIA_LINK_ADDRESS}
 echo "Funds bridged to ZKsync"
 SEPOLIA_BALANCE_AFTER=$(cast balance $(cast wallet address --account ${DEFAULT_ACCOUNT}) --erc20 ${SEPOLIA_REBASE_TOKEN_ADDRESS} --rpc-url ${ETH_SEPOLIA_RPC_URL})
 echo "Sepolia balance after bridging: $SEPOLIA_BALANCE_AFTER"
